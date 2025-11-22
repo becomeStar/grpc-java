@@ -81,7 +81,9 @@ public class TomcatTransportTest extends AbstractTransportTest {
         ServerTransportListener serverTransportListener =
             listener.transportCreated(new ServerTransportImpl(scheduler));
         ServletAdapter adapter =
-            new ServletAdapter(serverTransportListener, streamTracerFactories,
+            new ServletAdapter(
+                serverTransportListener,
+                streamTracerFactories,
                 ServletAdapter.DEFAULT_METHOD_NAME_RESOLVER,
                 Integer.MAX_VALUE);
         GrpcServlet grpcServlet = new GrpcServlet(adapter);
@@ -89,10 +91,12 @@ public class TomcatTransportTest extends AbstractTransportTest {
         tomcatServer = new Tomcat();
         tomcatServer.setPort(0);
         Context ctx = tomcatServer.addContext(MYAPP, new File("build/tmp").getAbsolutePath());
-        Tomcat.addServlet(ctx, "TomcatTransportTest", grpcServlet)
-            .setAsyncSupported(true);
+        Tomcat.addServlet(ctx, "TomcatTransportTest", grpcServlet).setAsyncSupported(true);
         ctx.addServletMappingDecoded("/*", "TomcatTransportTest");
         tomcatServer.getConnector().addUpgradeProtocol(new Http2Protocol());
+        tomcatServer
+            .getConnector()
+            .setProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false");
         try {
           tomcatServer.start();
         } catch (LifecycleException e) {
