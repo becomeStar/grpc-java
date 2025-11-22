@@ -94,9 +94,7 @@ public class TomcatTransportTest extends AbstractTransportTest {
         Tomcat.addServlet(ctx, "TomcatTransportTest", grpcServlet).setAsyncSupported(true);
         ctx.addServletMappingDecoded("/*", "TomcatTransportTest");
         tomcatServer.getConnector().addUpgradeProtocol(new Http2Protocol());
-        tomcatServer
-            .getConnector()
-            .setProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false");
+        tomcatServer.getConnector().setDiscardFacades(false);
         try {
           tomcatServer.start();
         } catch (LifecycleException e) {
